@@ -22,5 +22,5 @@ runs-on: ubuntu-latest
       run: npm install -g firebase-tools
 
    - name: Deploy to Firebase
-      run: firebase deploy --only hosting --token 1//03gTWjQ9tohlkCgYIARAAGAMSNwF-L9IrptdjXaaFUgA8Gc0Gp458ehTC7bAWL1pSrgcQ_PY1FqI5wOq7cwgTYiVPRA-biDK8b5A
+      run: firebase deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" 
 
