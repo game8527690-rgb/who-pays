@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Who Pays? - ניהול חובות</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<!-- Firebase core -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <!-- Firebase core -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
-<!-- Firestore -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <!-- Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-<!-- Analytics (optional) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+    <!-- Analytics (optional) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -20,11 +21,13 @@
             background-color: #0f172a;
             color: #f8fafc;
         }
+
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .input-focus:focus {
             outline: none;
             border-color: #10b981;
@@ -32,6 +35,7 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen p-4 md:p-8">
     <div class="max-w-md mx-auto">
         <!-- Header -->
@@ -57,13 +61,21 @@
             <h2 class="text-lg font-semibold mb-4 text-slate-200">הוספת תנועה חדשה</h2>
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-2">
-                    <button id="btn-type-plus" onclick="setDebtType('plus')" class="py-2 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-500/20 text-emerald-400 transition-all">חייבים לי (+)</button>
-                    <button id="btn-type-minus" onclick="setDebtType('minus')" class="py-2 rounded-xl font-bold border-2 border-transparent bg-slate-800 text-slate-400 transition-all">אני חייב (-)</button>
+                    <button id="btn-type-plus" onclick="setDebtType('plus')"
+                        class="py-2 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-500/20 text-emerald-400 transition-all">חייבים
+                        לי (+)</button>
+                    <button id="btn-type-minus" onclick="setDebtType('minus')"
+                        class="py-2 rounded-xl font-bold border-2 border-transparent bg-slate-800 text-slate-400 transition-all">אני
+                        חייב (-)</button>
                 </div>
-                <input type="text" id="name" placeholder="שם החבר" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
-                <input type="number" id="amount" placeholder="סכום (₪)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
-                <input type="text" id="reason" placeholder="עבור מה? (פיצה, קפה, טיול...)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
-                <button onclick="addDebt()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-emerald-500/20">שמירה</button>
+                <input type="text" id="name" placeholder="שם החבר"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
+                <input type="number" id="amount" placeholder="סכום (₪)"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
+                <input type="text" id="reason" placeholder="עבור מה? (פיצה, קפה, טיול...)"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
+                <button onclick="addDebt()"
+                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-emerald-500/20">שמירה</button>
             </div>
         </div>
 
@@ -71,7 +83,8 @@
         <div>
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">רשימת חובות</h2>
-                <button onclick="clearAll()" class="text-xs text-slate-500 hover:text-rose-400 transition-colors">נקה הכל</button>
+                <button onclick="clearAll()" class="text-xs text-slate-500 hover:text-rose-400 transition-colors">נקה
+                    הכל</button>
             </div>
             <div id="debt-list" class="space-y-3">
                 <!-- Items will be injected here -->
@@ -81,35 +94,35 @@
 
     <script>
         let debts = JSON.parse(localStorage.getItem('my_debts')) || [];
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAacZyMhmhYtZlKMl9cjgKhFkQBYExmIpM",
-  authDomain: "who-pays-manager.firebaseapp.com",
-  projectId: "who-pays-manager",
-  storageBucket: "who-pays-manager.firebasestorage.app",
-  messagingSenderId: "1085035455988",
-  appId: "1:1085035455988:web:2484e56757c233813685a1",
-  measurementId: "G-5YSZXQM6QF"
-};
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAacZyMhmhYtZlKMl9cjgKhFkQBYExmIpM",
+            authDomain: "who-pays-manager.firebaseapp.com",
+            projectId: "who-pays-manager",
+            storageBucket: "who-pays-manager.firebasestorage.app",
+            messagingSenderId: "1085035455988",
+            appId: "1:1085035455988:web:2484e56757c233813685a1",
+            measurementId: "G-5YSZXQM6QF"
+        };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
 
-// Firestore reference
-const db = firebase.firestore();
+        // Firestore reference
+        const db = firebase.firestore();
         let currentType = 'plus';
 
         function setDebtType(type) {
             currentType = type;
             const plusBtn = document.getElementById('btn-type-plus');
             const minusBtn = document.getElementById('btn-type-minus');
-            
-            if(type === 'plus') {
+
+            if (type === 'plus') {
                 plusBtn.classList.replace('border-transparent', 'border-emerald-500');
                 plusBtn.classList.replace('bg-slate-800', 'bg-emerald-500/20');
                 plusBtn.classList.replace('text-slate-400', 'text-emerald-400');
-                
+
                 minusBtn.classList.replace('border-rose-500', 'border-transparent');
                 minusBtn.classList.replace('bg-rose-500/20', 'bg-slate-800');
                 minusBtn.classList.replace('text-rose-400', 'text-slate-400');
@@ -117,7 +130,7 @@ const db = firebase.firestore();
                 minusBtn.classList.replace('border-transparent', 'border-rose-500');
                 minusBtn.classList.replace('bg-slate-800', 'bg-rose-500/20');
                 minusBtn.classList.replace('text-slate-400', 'text-rose-400');
-                
+
                 plusBtn.classList.replace('border-emerald-500', 'border-transparent');
                 plusBtn.classList.replace('bg-emerald-500/20', 'bg-slate-800');
                 plusBtn.classList.replace('text-emerald-400', 'text-slate-400');
@@ -145,7 +158,7 @@ const db = firebase.firestore();
 
             debts.unshift(newDebt);
             saveAndRender();
-            
+
             // Clear inputs
             document.getElementById('name').value = '';
             document.getElementById('amount').value = '';
@@ -166,7 +179,7 @@ const db = firebase.firestore();
             const container = document.getElementById('debt-list');
             const totalOwedToMeEl = document.getElementById('total-owed-to-me');
             const totalIOweEl = document.getElementById('total-i-owe');
-            
+
             container.innerHTML = '';
             let totalOwedToMe = 0;
             let totalIOwe = 0;
@@ -210,7 +223,7 @@ const db = firebase.firestore();
         }
 
         function clearAll() {
-            if(confirm('בטוח שרוצה למחוק את כל הנתונים?')) {
+            if (confirm('בטוח שרוצה למחוק את כל הנתונים?')) {
                 debts = [];
                 saveAndRender();
             }
@@ -220,4 +233,5 @@ const db = firebase.firestore();
         renderDebts();
     </script>
 </body>
+
 </html>

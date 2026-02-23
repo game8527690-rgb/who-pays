@@ -1,7 +1,7 @@
 {
   "name": "who-pays",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "./public/main.js",
   "scripts": {
     "start": "electron ."
   },
