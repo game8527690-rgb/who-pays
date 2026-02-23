@@ -34,15 +34,20 @@
             box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
         }
 
-        .author {
-          
-            font-size: 10px;
-            position: absolute;
-            bottom: 0px;
-            color: #8996a1;
-            margin: 0 auto;
-          
-        }
+       .author {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 10px;
+    font-size: 11px;
+    color: #64748b;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    letter-spacing: 0.03em;
+}
     </style>
 </head>
 
@@ -101,11 +106,9 @@
             </div>
         </div>
     </div>
-    <div class="author">
-        <span>Copyright (U)</span>
-        </divbr>
-        <span>This app was desing by yair the king (next elon mask)</span>
-    </div>
+  <footer class="author">
+    <span>© Who Pays? — Designed by Yair 👑</span>
+</footer>
 
     <script>
         let debts = JSON.parse(localStorage.getItem('my_debts')) || [];
