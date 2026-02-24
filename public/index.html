@@ -82,57 +82,73 @@ body { font-family: 'Assistant', sans-serif; background-color:#0f172a; color:#f8
 </footer>
 
 <script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAacZyMhmhYtZlKMl9cjgKhFkQBYExmIpM",
-    authDomain: "who-pays-manager.firebaseapp.com",
-    projectId: "who-pays-manager",
-    storageBucket: "who-pays-manager.appspot.com",
-    messagingSenderId: "1085035455988",
-    appId: "1:1085035455988:web:2484e56757c233813685a1",
-    measurementId: "G-5YSZXQM6QF"
-  };
-  // Initialize Firebase once
-  firebase.initializeApp(firebaseConfig);
+ /* ========= Firebase ========= */
+firebase.initializeApp(firebaseConfig);
 
-  const auth = firebase.auth();
-  const provider = new firebase.auth.GoogleAuthProvider();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const userInfo = document.getElementById("user-info");
-  const userEmail = document.getElementById("user-email");
+/* ========= כשהדף נטען ========= */
+window.addEventListener("DOMContentLoaded", () => {
 
-  loginBtn.classList.remove("hidden");
+const loginBtn  = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userInfo  = document.getElementById("user-info");
+const userEmail = document.getElementById("user-email");
+const app       = document.getElementById("app");
 
-  function updateUI(user){
-    if(user){
-      loginBtn.classList.add("hidden");
-      userInfo.classList.remove("hidden");
-      userEmail.textContent = user.email;
-    } else {
-      loginBtn.classList.remove("hidden");
-      userInfo.classList.add("hidden");
-      userEmail.textContent = "";
-    }
+/* אם האלמנטים לא קיימים — עצור */
+if(!loginBtn || !logoutBtn || !userInfo || !userEmail){
+console.error("HTML elements missing");
+return;
+}
+
+/* ---- התחברות ---- */
+loginBtn.onclick = () => {
+auth.signInWithPopup(provider)
+.catch(err => console.error("Login error:", err));
+};
+
+/* ---- התנתקות ---- */
+logoutBtn.onclick = () => {
+auth.signOut();
+};
+
+/* ---- מאזין משתמש ---- */
+auth.onAuthStateChanged(user => {
+
+```
+if (user) {
+  console.log("מחובר:", user.email);
+
+  loginBtn.classList.add("hidden");
+  userInfo.classList.remove("hidden");
+  if(app) app.style.display = "block";
+
+  userEmail.textContent = user.email;
+
+  if (typeof loadDebts === "function") {
+    loadDebts();
   }
 
-  auth.onAuthStateChanged(updateUI);
+} else {
+  console.log("לא מחובר");
 
-  loginBtn.onclick = async () => {
-    try {
-      const result = await auth.signInWithPopup(provider);
-      updateUI(result.user);
-    } catch(err) {
-      console.error("Login error:", err);
-    }
-  };
+  loginBtn.classList.remove("hidden");
+  userInfo.classList.add("hidden");
+  if(app) app.style.display = "none";
+  userEmail.textContent = "";
+}
+```
 
-  logoutBtn.onclick = async () => {
-    await auth.signOut();
-    updateUI(null);
-  };
 
+
+
+});
+
+});
+
+ 
   // -------------------------------
   // Debt management
   // -------------------------------
