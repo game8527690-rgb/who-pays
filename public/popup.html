@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Popup - Who Pays?</title>
+<style>
+body { font-family: 'Assistant', sans-serif; background-color:#1e293b; color:#f8fafc; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; padding:20px; }
+button { padding: 12px 24px; background:#10b981; border:none; border-radius:10px; color:white; font-weight:bold; cursor:pointer; transition:0.2s; margin-top:10px; }
+button:hover { background:#059669; }
+#debt-list { margin-top:20px; width:100%; max-height:300px; overflow-y:auto; }
+.debt-card { background: rgba(30,41,59,0.7); margin-bottom:10px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); }
+</style>
+</head>
+<body>
+<h1>סיכום חובות</h1>
+<div id="debt-list">טוען חובות...</div>
+
+<button id="addDebtBtn">הוסף חוב לדוגמה</button>
+<button id="closeBtn">סגור פופאפ</button>
+
+<script>
+const closeBtn = document.getElementById('closeBtn');
+const addDebtBtn = document.getElementById('addDebtBtn');
+const debtList = document.getElementById('debt-list');
+
+let debts = [];
+
+/* סגירה לאופנר */
+closeBtn.addEventListener('click', ()=>{
+  if(window.opener){
+    window.opener.postMessage({action:'closePopup'},'*');
+  }
+});
+
+/* הוספת חוב לדוגמה מהפופאפ */
+addDebtBtn.addEventListener('click', ()=>{
+  const newDebt = {
+    id: Date.now(),
+    name: 'יוסי',
+    amount: 50,
+    reason: 'קפה',
+    type: 'plus',
+    date: new Date().toLocaleDateString('he-IL')
+  };
+
+  debts.unshift(newDebt);
+  renderDebts();
+
+  // שלח חוב חזרה לאפליקציה
+  if(window.opener){
+    window.opener.postMessage({action:'addDebt', debt:newDebt}, '*');
+  }
+});
+
+/* קבלת הודעות מהאופנר */
+window.addEventListener('message', (event)=>{
+  const data = event.data;
+  if(data.action === 'loadDebts' && Array.isArray(data.debts)){
+    debts = data.debts;
+    renderDebts();
+  }
+});
+
+/* הצגת חובות */
+function renderDebts(){
+  if(!debtList) return;
+  debtList.innerHTML = '';
+  if(debts.length===0){
+    debtList.innerHTML = '<p style="text-align:center; color:#94a3b8;">אין חובות</p>';
+    return;
+  }
+  debts.forEach(d=>{
+    const div = document.createElement('div');
+    div.className='debt-card';
+    div.innerHTML = `<strong>${d.name}</strong> - ₪${d.amount} - ${d.reason} - ${d.date}`;
+    debtList.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
