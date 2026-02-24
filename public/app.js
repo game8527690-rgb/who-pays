@@ -21,3 +21,13 @@ db.collection("test").add({
 })
 .then(docRef => console.log("Document written with ID:", docRef.id))
 .catch(error => console.error("Error adding document:", error));
+// AUTH
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+async function signInWithGoogle() {
+  try {
+    await auth.signInWithPopup(provider);
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+}
