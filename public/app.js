@@ -1,6 +1,4 @@
-// ===========================
-// Firebase configuration
-// ===========================
+// Firebase config
 const firebaseConfig = {
   apiKey: "API_KEY",
   authDomain: "PROJECT_ID.firebaseapp.com",
@@ -10,9 +8,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// ===========================
-// Auth setup
-// ===========================
+// Auth
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -22,7 +18,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 const userInfo = document.getElementById("user-info");
 const userEmail = document.getElementById("user-email");
 
-// Function to update UI
+// Update UI
 function updateUI(user) {
   if (user) {
     loginBtn.classList.add("hidden");
@@ -35,12 +31,10 @@ function updateUI(user) {
   }
 }
 
-// Check auth state on page load
-auth.onAuthStateChanged((user) => {
-  updateUI(user);
-});
+// Check auth state
+auth.onAuthStateChanged(updateUI);
 
-// Login with Google
+// Login
 loginBtn.onclick = async () => {
   try {
     const result = await auth.signInWithPopup(provider);
