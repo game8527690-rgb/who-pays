@@ -1,42 +1,35 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Who Pays? - ניהול חובות</title> 
+<title>Who Pays? - ניהול חובות</title>
 
-<!-- Tailwind (לפרודקשן תתקין עם CLI או PostCSS) -->
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Firebase - רק compat -->
+<!-- Firebase compat -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 
-<!-- הקוד שלך -->
-<script src="auth.js"></script>
-    <style>
-        body {
-            font-family: 'Assistant', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-        }
-
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .input-focus:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-        }
-
-       .author {
+<style>
+body {
+    font-family: 'Assistant', sans-serif;
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.input-focus:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+.author {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -50,210 +43,230 @@
     border-top: 1px solid rgba(255,255,255,0.06);
     letter-spacing: 0.03em;
 }
-    </style>
+</style>
 </head>
 
 <body class="min-h-screen p-4 md:p-8">
-    <div class="max-w-md mx-auto">
-        <!-- Header -->
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-emerald-400 mb-2">Who Pays?</h1>
-            <p class="text-slate-400">ניהול הלוואות וחובות בין חברים</p>
-            <div id="auth-container" class="mt-4 space-y-2">
-              
+<div class="max-w-md mx-auto">
+
+    <!-- Header -->
+    <header class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-emerald-400 mb-2">Who Pays?</h1>
+        <p class="text-slate-400">ניהול הלוואות וחובות בין חברים</p>
+        <div id="auth-container" class="mt-4 space-y-2">
             <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl flex items-center justify-center gap-2 hidden">
                 התחברות עם Google
             </button>
-
             <div id="user-info" class="hidden text-center text-slate-300 py-2">
                 <span id="user-email" class="block text-sm mb-2"></span>
                 <button id="logoutBtn" class="text-xs bg-rose-600 hover:bg-rose-700 text-white py-1 px-3 rounded">
                     התנתקות
                 </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="glass-card p-4 rounded-2xl text-center">
-                <span class="block text-xs text-slate-400 uppercase tracking-wider mb-1">חייבים לי</span>
-                <span id="total-owed-to-me" class="text-2xl font-bold text-emerald-400">₪0</span>
-            </div>
-            <div class="glass-card p-4 rounded-2xl text-center">
-                <span class="block text-xs text-slate-400 uppercase tracking-wider mb-1">אני חייב</span>
-                <span id="total-i-owe" class="text-2xl font-bold text-rose-400">₪0</span>
             </div>
         </div>
+    </header>
 
-        <!-- Add New Debt Form -->
-        <div class="glass-card p-6 rounded-3xl mb-8">
-            <h2 class="text-lg font-semibold mb-4 text-slate-200">הוספת תנועה חדשה</h2>
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-2">
-                    <button id="btn-type-plus" onclick="setDebtType('plus')"
-                        class="py-2 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-500/20 text-emerald-400 transition-all">חייבים
-                        לי (+)</button>
-                    <button id="btn-type-minus" onclick="setDebtType('minus')"
-                        class="py-2 rounded-xl font-bold border-2 border-transparent bg-slate-800 text-slate-400 transition-all">אני
-                        חייב (-)</button>
-                </div>
-                <input type="text" id="name" placeholder="שם החבר"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
-                <input type="number" id="amount" placeholder="סכום (₪)"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
-                <input type="text" id="reason" placeholder="עבור מה? (פיצה, קפה, טיול...)"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
-                <button onclick="addDebt()"
-                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-emerald-500/20">שמירה</button>
-            </div>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="glass-card p-4 rounded-2xl text-center">
+            <span class="block text-xs text-slate-400 uppercase tracking-wider mb-1">חייבים לי</span>
+            <span id="total-owed-to-me" class="text-2xl font-bold text-emerald-400">₪0</span>
         </div>
-
-        <!-- Debt List -->
-        <div>
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">רשימת חובות</h2>
-                <button onclick="clearAll()" class="text-xs text-slate-500 hover:text-rose-400 transition-colors">נקה
-                    הכל</button>
-            </div>
-            <div id="debt-list" class="space-y-3">
-                <!-- Items will be injected here -->
-            </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+            <span class="block text-xs text-slate-400 uppercase tracking-wider mb-1">אני חייב</span>
+            <span id="total-i-owe" class="text-2xl font-bold text-rose-400">₪0</span>
         </div>
     </div>
-  <footer class="author">
+
+    <!-- Add New Debt Form -->
+    <div class="glass-card p-6 rounded-3xl mb-8">
+        <h2 class="text-lg font-semibold mb-4 text-slate-200">הוספת תנועה חדשה</h2>
+        <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-2">
+                <button id="btn-type-plus" onclick="setDebtType('plus')"
+                    class="py-2 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-500/20 text-emerald-400 transition-all">חייבים לי (+)</button>
+                <button id="btn-type-minus" onclick="setDebtType('minus')"
+                    class="py-2 rounded-xl font-bold border-2 border-transparent bg-slate-800 text-slate-400 transition-all">אני חייב (-)</button>
+            </div>
+            <input type="text" id="name" placeholder="שם החבר" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
+            <input type="number" id="amount" placeholder="סכום (₪)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
+            <input type="text" id="reason" placeholder="עבור מה? (פיצה, קפה, טיול...)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 input-focus">
+            <button onclick="addDebt()"
+                class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition-all transform active:scale-95 shadow-lg shadow-emerald-500/20">שמירה</button>
+        </div>
+    </div>
+
+    <!-- Debt List -->
+    <div>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">רשימת חובות</h2>
+            <button onclick="clearAll()" class="text-xs text-slate-500 hover:text-rose-400 transition-colors">נקה הכל</button>
+        </div>
+        <div id="debt-list" class="space-y-3"></div>
+    </div>
+</div>
+
+<footer class="author">
     <span>© Who Pays? — Designed by Yair 👑</span>
 </footer>
 
-    <script>
-        let debts = JSON.parse(localStorage.getItem('my_debts')) || [];
-        // Firebase configuration
-       
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-        // Firestore reference
-        const db = firebase.firestore();
-        let currentType = 'plus';
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "API_KEY",
+        authDomain: "PROJECT_ID.firebaseapp.com",
+        projectId: "PROJECT_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-        function setDebtType(type) {
-            currentType = type;
-            const plusBtn = document.getElementById('btn-type-plus');
-            const minusBtn = document.getElementById('btn-type-minus');
+    // Auth setup
+    const auth = firebase.auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-            if (type === 'plus') {
-                plusBtn.classList.replace('border-transparent', 'border-emerald-500');
-                plusBtn.classList.replace('bg-slate-800', 'bg-emerald-500/20');
-                plusBtn.classList.replace('text-slate-400', 'text-emerald-400');
+    // DOM elements
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userInfo = document.getElementById("user-info");
+    const userEmail = document.getElementById("user-email");
 
-                minusBtn.classList.replace('border-rose-500', 'border-transparent');
-                minusBtn.classList.replace('bg-rose-500/20', 'bg-slate-800');
-                minusBtn.classList.replace('text-rose-400', 'text-slate-400');
-            } else {
-                minusBtn.classList.replace('border-transparent', 'border-rose-500');
-                minusBtn.classList.replace('bg-slate-800', 'bg-rose-500/20');
-                minusBtn.classList.replace('text-slate-400', 'text-rose-400');
+    loginBtn.classList.remove("hidden");
 
-                plusBtn.classList.replace('border-emerald-500', 'border-transparent');
-                plusBtn.classList.replace('bg-emerald-500/20', 'bg-slate-800');
-                plusBtn.classList.replace('text-emerald-400', 'text-slate-400');
-            }
+    function updateUI(user) {
+        if (user) {
+            loginBtn.classList.add("hidden");
+            userInfo.classList.remove("hidden");
+            userEmail.innerText = user.email;
+        } else {
+            loginBtn.classList.remove("hidden");
+            userInfo.classList.add("hidden");
+            userEmail.innerText = "";
         }
+    }
 
-        function addDebt() {
-            const name = document.getElementById('name').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const reason = document.getElementById('reason').value;
+    auth.onAuthStateChanged(updateUI);
 
-            if (!name || !amount) {
-                alert('נא להזין שם וסכום');
-                return;
-            }
-
-            const newDebt = {
-                id: Date.now(),
-                name,
-                amount,
-                reason,
-                type: currentType,
-                date: new Date().toLocaleDateString('he-IL')
-            };
-
-            debts.unshift(newDebt);
-            saveAndRender();
-
-            // Clear inputs
-            document.getElementById('name').value = '';
-            document.getElementById('amount').value = '';
-            document.getElementById('reason').value = '';
+    loginBtn.onclick = async () => {
+        try {
+            const result = await auth.signInWithPopup(provider);
+            updateUI(result.user);
+        } catch (err) {
+            console.error("Login error:", err);
         }
+    };
 
-        function deleteDebt(id) {
-            debts = debts.filter(d => d.id !== id);
-            saveAndRender();
+    logoutBtn.onclick = async () => {
+        await auth.signOut();
+        updateUI(null);
+    };
+
+    // -------------------------------
+    // Debt management
+    // -------------------------------
+    let debts = JSON.parse(localStorage.getItem('my_debts')) || [];
+    let currentType = 'plus';
+
+    window.setDebtType = (type) => {
+        currentType = type;
+        const plusBtn = document.getElementById('btn-type-plus');
+        const minusBtn = document.getElementById('btn-type-minus');
+
+        if (type === 'plus') {
+            plusBtn.classList.replace('border-transparent','border-emerald-500');
+            plusBtn.classList.replace('bg-slate-800','bg-emerald-500/20');
+            plusBtn.classList.replace('text-slate-400','text-emerald-400');
+
+            minusBtn.classList.replace('border-rose-500','border-transparent');
+            minusBtn.classList.replace('bg-rose-500/20','bg-slate-800');
+            minusBtn.classList.replace('text-rose-400','text-slate-400');
+        } else {
+            minusBtn.classList.replace('border-transparent','border-rose-500');
+            minusBtn.classList.replace('bg-slate-800','bg-rose-500/20');
+            minusBtn.classList.replace('text-slate-400','text-rose-400');
+
+            plusBtn.classList.replace('border-emerald-500','border-transparent');
+            plusBtn.classList.replace('bg-emerald-500/20','bg-slate-800');
+            plusBtn.classList.replace('text-emerald-400','text-slate-400');
         }
+    };
 
-        function saveAndRender() {
-            localStorage.setItem('my_debts', JSON.stringify(debts));
-            renderDebts();
-        }
+    window.addDebt = () => {
+        const name = document.getElementById('name').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+        const reason = document.getElementById('reason').value;
 
-        function renderDebts() {
-            const container = document.getElementById('debt-list');
-            const totalOwedToMeEl = document.getElementById('total-owed-to-me');
-            const totalIOweEl = document.getElementById('total-i-owe');
+        if (!name || !amount) { alert('נא להזין שם וסכום'); return; }
 
-            container.innerHTML = '';
-            let totalOwedToMe = 0;
-            let totalIOwe = 0;
+        const newDebt = { id: Date.now(), name, amount, reason, type: currentType, date: new Date().toLocaleDateString('he-IL') };
+        debts.unshift(newDebt);
+        saveAndRender();
 
-            if (debts.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-500 italic">אין חובות רשומים. הכל נקי!</div>`;
-            }
+        document.getElementById('name').value='';
+        document.getElementById('amount').value='';
+        document.getElementById('reason').value='';
+    };
 
-            debts.forEach(debt => {
-                if (debt.type === 'plus') totalOwedToMe += debt.amount;
-                else totalIOwe += debt.amount;
+    window.deleteDebt = (id) => {
+        debts = debts.filter(d => d.id!==id);
+        saveAndRender();
+    };
 
-                const card = document.createElement('div');
-                card.className = 'glass-card p-4 rounded-2xl flex justify-between items-center animate-fadeIn';
-                card.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold ${debt.type === 'plus' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
-                            ${debt.name.charAt(0)}
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-100">${debt.name}</h3>
-                            <p class="text-xs text-slate-500">${debt.reason || 'ללא תיאור'} • ${debt.date}</p>
-                        </div>
-                    </div>
-                    <div class="text-left flex items-center gap-4">
-                        <span class="font-bold text-lg ${debt.type === 'plus' ? 'text-emerald-400' : 'text-rose-400'}">
-                            ${debt.type === 'plus' ? '+' : '-'} ₪${debt.amount}
-                        </span>
-                        <button onclick="deleteDebt(${debt.id})" class="text-slate-600 hover:text-rose-400 p-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+    window.clearAll = () => {
+        if(confirm('בטוח שרוצה למחוק את כל הנתונים?')) { debts = []; saveAndRender(); }
+    };
 
-            totalOwedToMeEl.innerText = `₪${totalOwedToMe}`;
-            totalIOweEl.innerText = `₪${totalIOwe}`;
-        }
-
-        function clearAll() {
-            if (confirm('בטוח שרוצה למחוק את כל הנתונים?')) {
-                debts = [];
-                saveAndRender();
-            }
-        }
-
-        // Initial render
+    function saveAndRender() {
+        localStorage.setItem('my_debts', JSON.stringify(debts));
         renderDebts();
-    </script>
-    
-</body>
+    }
 
+    function renderDebts() {
+        const container = document.getElementById('debt-list');
+        const totalOwedToMeEl = document.getElementById('total-owed-to-me');
+        const totalIOweEl = document.getElementById('total-i-owe');
+
+        container.innerHTML = '';
+        let totalOwedToMe = 0;
+        let totalIOwe = 0;
+
+        if(debts.length===0) {
+            container.innerHTML = `<div class="text-center py-10 text-slate-500 italic">אין חובות רשומים. הכל נקי!</div>`;
+        }
+
+        debts.forEach(debt => {
+            if(debt.type==='plus') totalOwedToMe+=debt.amount;
+            else totalIOwe+=debt.amount;
+
+            const card = document.createElement('div');
+            card.className='glass-card p-4 rounded-2xl flex justify-between items-center animate-fadeIn';
+            card.innerHTML=`
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold ${debt.type==='plus'?'bg-emerald-500/20 text-emerald-400':'bg-rose-500/20 text-rose-400'}">${debt.name.charAt(0)}</div>
+                <div>
+                    <h3 class="font-semibold text-slate-100">${debt.name}</h3>
+                    <p class="text-xs text-slate-500">${debt.reason || 'ללא תיאור'} • ${debt.date}</p>
+                </div>
+            </div>
+            <div class="text-left flex items-center gap-4">
+                <span class="font-bold text-lg ${debt.type==='plus'?'text-emerald-400':'text-rose-400'}">${debt.type==='plus'?'+':'-'} ₪${debt.amount}</span>
+                <button onclick="deleteDebt(${debt.id})" class="text-slate-600 hover:text-rose-400 p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>`;
+            container.appendChild(card);
+        });
+
+        totalOwedToMeEl.innerText=`₪${totalOwedToMe}`;
+        totalIOweEl.innerText=`₪${totalIOwe}`;
+    }
+
+    renderDebts();
+
+});
+</script>
+
+</body>
 </html>
