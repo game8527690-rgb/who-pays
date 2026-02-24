@@ -128,19 +128,7 @@
     <script>
         let debts = JSON.parse(localStorage.getItem('my_debts')) || [];
         // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAacZyMhmhYtZlKMl9cjgKhFkQBYExmIpM",
-            authDomain: "who-pays-manager.firebaseapp.com",
-            projectId: "who-pays-manager",
-            storageBucket: "who-pays-manager.firebasestorage.app",
-            messagingSenderId: "1085035455988",
-            appId: "1:1085035455988:web:2484e56757c233813685a1",
-            measurementId: "G-5YSZXQM6QF"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        firebase.analytics();
+       
 
         // Firestore reference
         const db = firebase.firestore();
@@ -265,7 +253,7 @@
         // Initial render
         renderDebts();
     </script>
-      <script src="app.js"></script>
+    
 </body>
 
 </html>
